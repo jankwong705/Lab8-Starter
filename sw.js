@@ -19,10 +19,13 @@ const RECIPE_URLS = [
 // Installs the service worker. Feed it some initial URLs to cache
 self.addEventListener('install', function (event) {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function (cache) {
-      // B6. TODO - Add all of the URLs from RECIPE_URLs here so that they are
-      //            added to the cache when the ServiceWorker is installed
-      return cache.addAll(RECIPE_URLS);
+    caches.open(CACHE_NAME).then(function(cache) {
+      return Promise.all(
+        // add each url
+        RECIPE_URLS.map((url) => {  // catch errors
+          return cache.add(url).catch((error) => { console.error('Failed to cache', url, error); });
+        })
+      );
     })
   );
 });
@@ -33,7 +36,7 @@ self.addEventListener('activate', function (event) {
 });
 
 // Intercept fetch requests and cache them
-self.addEventListener('fetch', function (event) {
+self.addEventListener('fetch', async function (event) {
   // We added some known URLs to the cache above, but tracking down every
   // subsequent network request URL and adding it manually would be very taxing.
   // We will be adding all of the resources not specified in the intiial cache
@@ -47,14 +50,13 @@ self.addEventListener('fetch', function (event) {
   /*******************************/
   // B7. TODO - Respond to the event by opening the cache using the name we gave
   //            above (CACHE_NAME)
-
   event.respondWith(
-    caches.open(CACHE_NAME).then*function (cache) {
+    caches.open(CACHE_NAME).then(function (cache) {
       return cache.match(event.request).then(function (response) {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then(function(networkResponse) {
+  // B8. TODO - If the request is in the cache, return with the cached version.
+  //            Otherwise fetch the resource, add it to the cache, and return
+  //            network response.
+        return response || fetch(event.request).then(function (networkResponse) {
           if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
             return networkResponse;
           }
@@ -62,9 +64,6 @@ self.addEventListener('fetch', function (event) {
           return networkResponse;
         });
       });
-    }
+    })
   );
-  // B8. TODO - If the request is in the cache, return with the cached version.
-  //            Otherwise fetch the resource, add it to the cache, and return
-  //            network response.
 });
