@@ -65,7 +65,7 @@ function initializeServiceWorker() {
 
           // B5. TODO - In the event that the service worker registration fails, console
           //            log that it has failed.
-          console.error('Service Workers are not supported in this browser.');
+          console.error('Service Workers are not supported in this browser.', error);
       });
     });
   } else {
