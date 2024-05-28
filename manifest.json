@@ -2,7 +2,7 @@
     "name": "jan-ethan-michael",
     "short_name": "Lab8-Starter",
     "description": "Receipe Cards",
-    "start_url": "./",
+    "start_url": "./Lab8-Starter",
     "display": "standalone",
     "background_color": "white",
     "theme_color": "green",
